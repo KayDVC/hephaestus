@@ -1,0 +1,11 @@
+# OS specific
+/**/.DS_Store
+
+# Build Artifacts
+build/
+
+# Python Stuff
+*/env
+/**/__pycache__/
+
+
