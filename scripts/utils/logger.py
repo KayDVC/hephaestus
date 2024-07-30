@@ -65,7 +65,7 @@ def get_logger(verbose:bool=False) -> logging.Logger:
 
     # add handler for stdout.
     std_out_handler = logging.StreamHandler()
-    std_out_handler.setLevel(logging.DEBUG if verbose else logging.WARNING)  # display messages based on specified verbosity.
+    std_out_handler.setLevel(logging.DEBUG if verbose else logging.INFO)  # display messages based on specified verbosity.
     std_out_handler.setFormatter(log_formatter)
     logger.addHandler(std_out_handler)
 

@@ -1,11 +1,14 @@
 # OS specific
 /**/.DS_Store
 
+# Dev Environment
+.vscode/
+
 # Build Artifacts
 build/
 
 # Python Stuff
-*/env
+*/env/
 /**/__pycache__/
 
 

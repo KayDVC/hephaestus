@@ -115,8 +115,8 @@ add_library(${{subm_name}}
 {get_header_files(path)}
 )
 
-# Ensure submodule accessible using Hephaestus::<submodule_name>.
-# Note does not account for nested folders.
+# Ensure submodule accessible using hephaestus::<submodule_name>.
+# Note, does not account for nested folders.
 add_library(${{PROJECT_NAME}}::${{subm_name}} ALIAS ${{subm_name}})
 
 # Submodule Meta Data
@@ -206,6 +206,7 @@ def write_cmake_file(path:Path, template:str):
     logger.info(f"Wrote template to CMake file at:\n{cmake_file}")
 
 def main():
+    global logger
 
     parser = argparse.ArgumentParser(
         prog="Generate Submodule CMake Script",
@@ -269,7 +270,6 @@ def main():
         print(VERSION)
         return
 
-    global logger
     logger = get_logger(args.verbose)
 
     # Determine whether expected path is valid

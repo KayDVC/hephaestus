@@ -9,13 +9,14 @@ set(subm_name common)
 # Add all source and header files in submodule
 add_library(${subm_name}
 file.cpp
-${PROJECT_SOURCE_DIR}/include/hephaestus/common/enums.hpp
-${PROJECT_SOURCE_DIR}/include/hephaestus/common/math.hpp
-${PROJECT_SOURCE_DIR}/include/hephaestus/common/conversions.hpp
-${PROJECT_SOURCE_DIR}/include/hephaestus/common/sizes.hpp
+${PROJECT_SOURCE_DIR}/include/hephaestus/common/conversions.h
+${PROJECT_SOURCE_DIR}/include/hephaestus/common/sizes.h
+${PROJECT_SOURCE_DIR}/include/hephaestus/common/enums.h
+${PROJECT_SOURCE_DIR}/include/hephaestus/common/math.h
 )
 
-# Ensure submodule accessible using Hephaestus::<submodule_name>
+# Ensure submodule accessible using hephaestus::<submodule_name>.
+# Note, does not account for nested folders.
 add_library(${PROJECT_NAME}::${subm_name} ALIAS ${subm_name})
 
 # Submodule Meta Data

@@ -9,10 +9,11 @@ set(subm_name containers)
 # Add all source and header files in submodule
 add_library(${subm_name}
 ArrayList.cpp
-${PROJECT_SOURCE_DIR}/include/hephaestus/containers/ArrayList.hpp
+${PROJECT_SOURCE_DIR}/include/hephaestus/containers/ArrayList.h
 )
 
-# Ensure submodule accessible using Hephaestus::<submodule_name>
+# Ensure submodule accessible using hephaestus::<submodule_name>.
+# Note, does not account for nested folders.
 add_library(${PROJECT_NAME}::${subm_name} ALIAS ${subm_name})
 
 # Submodule Meta Data
