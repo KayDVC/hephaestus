@@ -1,0 +1,79 @@
+# Designed for clang-format version: 18.1.6
+
+# I tend to follow the CppCoreGuidelines (https://github.com/isocpp/CppCoreGuidelines).
+# Most of these boil down to personal preference, prioritizing the "easy-to-see" principle.
+BasedOnStyle: LLVM
+Language: Cpp
+
+# Common Indents
+IndentWidth: 4
+BracedInitializerIndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+SpacesBeforeTrailingComments: 4
+
+# Alignments
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Right
+AlignTrailingComments: Always
+
+DerivePointerAlignment: false # Force pointers to the type for C++.
+PointerAlignment: Left
+
+
+# Rules
+AllowBreakBeforeNoexceptSpecifier: Never
+AllowShortBlocksOnASingleLine: Always
+AllowShortEnumsOnASingleLine: false
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+ColumnLimit: 120
+CompactNamespaces: false
+Cpp11BracedListStyle: false
+EmptyLineAfterAccessModifier: Always
+EmptyLineBeforeAccessModifier: LogicalBlock
+FixNamespaceComments: true
+IncludeBlocks: Preserve # Sort includes based on existing grouping.
+IndentCaseLabels: true
+IndentWrappedFunctionNames: true
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: Inner
+QualifierAlignment: Custom
+QualifierOrder: [
+  static,
+  constexpr,
+  friend,
+  type,
+  volatile
+] # Constness should be respected as typed. i.e. const int* vs int const*.
+RemoveSemicolon: true
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: false
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpacesInAngles: Never
+SpacesInLineCommentPrefix: 
+  Minimum: 1
+  Maximum: 1
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: false
+  InCStyleCasts: false
+  InEmptyParentheses: false
+  Other: false
+SpacesInSquareBrackets: false
+Standard: c++17
+UseTab: Never
+
+
+# Custom Mappings
+CommentPragmas: '^NO-FORMAT:' # Comments with this inside will not be formatted.
