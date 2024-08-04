@@ -15,7 +15,7 @@ from utils.meta import Meta
     line arguments.
 """
 # Utility Meta Data
-VERSION = "v1.0.0"
+VERSION = "1.0.0"
 
 # Set to a logger object before use.
 logger = None
@@ -50,15 +50,15 @@ def get_source_files(path: Path) -> str:
         for f in path.iterdir()
         if (
             f.is_file()
-            and (f.suffix in [".cpp", ".c", ".hpp", ".h"])
+            and (f.suffix in [".cpp", ".h"])
             and (f.stem not in submodule_config["files_to_exclude"])
         )
     ]:
         source_files.append(file.name)
-    
+
     normalized_files = "\n".join(source_files)
     logger.debug(f"Source files retrieved:\n{normalized_files}")
-    
+
     return "\n".join(source_files)
 
 
@@ -77,9 +77,9 @@ def get_header_files(path: Path) -> str:
         I.e The following condition must be met:
             `src`/<...>/submodule_src = `include/hephaestus`/<...>/submodule_headers
     """
-    
-    path = Path(Meta.PINCLUDE, path.relative_to(Meta.SRC)) 
-    
+
+    path = Path(Meta.PINCLUDE, path.relative_to(Meta.SRC))
+
     # Get all C or C++ header files, excluding files as necessary.
     header_files = []
     for file in [
@@ -87,21 +87,21 @@ def get_header_files(path: Path) -> str:
         for f in path.iterdir()
         if (
             f.is_file()
-            and (f.suffix in [".hpp", ".h"])
+            and (f.suffix == ".h")
             and (f.stem not in submodule_config["files_to_exclude"])
         )
     ]:
         header_files.append(f"${{PROJECT_SOURCE_DIR}}/{file.relative_to(Meta.ROOT)}")
-    
+
     normalized_files = "\n".join(header_files)
     logger.debug(f"Header files retrieved:\n{normalized_files}")
 
     return normalized_files
 
+
 def draft_template(path: Path) -> str:
 
-    template = (
-f"""
+    template = f"""
 ## 
 # Generated using `Generate Submodule Cmake Lists Utility` {VERSION}
 ##
@@ -115,6 +115,14 @@ add_library(${{subm_name}}
 {get_header_files(path)}
 )
 
+# Ensure all files within the current directory accessible to files
+# in this submodule. These are considered private and should not 
+# be accessible to external users.
+target_include_directories(${{subm_name}}
+	PRIVATE
+	${{CMAKE_CURRENT_LIST_DIR}}
+)
+
 # Ensure submodule accessible using hephaestus::<submodule_name>.
 # Note, does not account for nested folders.
 add_library(${{PROJECT_NAME}}::${{subm_name}} ALIAS ${{subm_name}})
@@ -123,23 +131,20 @@ add_library(${{PROJECT_NAME}}::${{subm_name}} ALIAS ${{subm_name}})
 set_target_properties(${{subm_name}} PROPERTIES VERSION ${{PROJECT_VERSION}})
 set_target_properties(${{subm_name}} PROPERTIES SOVERSION ${{PROJECT_VERSION_MAJOR}})
 """
-)
 
     if len(submodule_config["dependencies"]) > 0:
-        template += (
-f"""
+        template += f"""
 # Include internal/external dependencies.
 target_link_libraries(${{subm_name}} PUBLIC
 {"\n".join(submodule_config["dependencies"])}
 )
 """
-        )
-    
-    
+
     logger.debug(f"Generated Template:\n{template}")
     logger.info("Template successfully generated.")
-        
+
     return template
+
 
 ##
 # File I/O
@@ -187,7 +192,8 @@ def read_config_file(path: Path):
             logger.info(f"Received file to exclude: {file}")
             submodule_config["files_to_exclude"].append(f"{file}")
 
-def write_cmake_file(path:Path, template:str):
+
+def write_cmake_file(path: Path, template: str):
     """Saves passed CMake template to `CMakeLists.txt` in directory specified.
 
     Args:
@@ -195,15 +201,16 @@ def write_cmake_file(path:Path, template:str):
         template (str): the generated CMake script template to write.
     """
     cmake_file = Path(path, "CMakeLists.txt")
-    
+
     try:
-        with cmake_file.open('w') as f:
+        with cmake_file.open("w") as f:
             f.write(template)
     except:
         logger.error(f"Failed to create CMake file at:\n{cmake_file}")
         raise
-    
+
     logger.info(f"Wrote template to CMake file at:\n{cmake_file}")
+
 
 def main():
     global logger
@@ -265,9 +272,9 @@ def main():
         help="Print version of the script",
     )
     args = parser.parse_args()
-    
+
     if args.version:
-        print(VERSION)
+        print(f"v{VERSION}")
         return
 
     logger = get_logger(args.verbose)
@@ -277,7 +284,7 @@ def main():
     if path.is_file():
         logger.error(f"Expected path to a directory.")
         return
-    
+
     if not path.is_dir():
         logger.error(f"Unable to find path: \n\t{path}")
         return
@@ -311,9 +318,10 @@ def main():
                 'Overriding files to exclude from configuration file.' if (len(submodule_config['files_to_exclude']) > 0) else ''}"
         )
         submodule_config["files_to_exclude"] = args.files_to_exclude
-    
+
     # Create CMakeLists.txt file for the given module.
     write_cmake_file(path, draft_template(path))
-    
+
+
 if __name__ == "__main__":
     main()

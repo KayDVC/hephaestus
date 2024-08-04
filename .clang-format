@@ -2,7 +2,7 @@
 
 # I tend to follow the CppCoreGuidelines (https://github.com/isocpp/CppCoreGuidelines).
 # Most of these boil down to personal preference, prioritizing the "easy-to-see" principle.
-BasedOnStyle: LLVM
+BasedOnStyle: Microsoft
 Language: Cpp
 
 # Common Indents
@@ -14,6 +14,27 @@ SpacesBeforeTrailingComments: 4
 # Alignments
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Right
+AlignConsecutiveAssignments: 
+  Enabled: true
+  AcrossComments: true
+  AcrossEmptyLines: false
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossComments: true
+  AcrossEmptyLines: false
+  AlignFunctionPointers: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossComments: true
+  AcrossEmptyLines: false
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossComments: true
+  AcrossEmptyLines: false
+  AlignCaseColons: true
+
 AlignTrailingComments: Always
 
 DerivePointerAlignment: false # Force pointers to the type for C++.
@@ -23,7 +44,9 @@ PointerAlignment: Left
 # Rules
 AllowBreakBeforeNoexceptSpecifier: Never
 AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
 AllowShortEnumsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: true
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
@@ -45,7 +68,7 @@ QualifierOrder: [
   constexpr,
   friend,
   type,
-  volatile
+  volatile,
 ] # Constness should be respected as typed. i.e. const int* vs int const*.
 RemoveSemicolon: true
 SpaceAfterCStyleCast: false
@@ -61,7 +84,7 @@ SpaceBeforeRangeBasedForLoopColon: false
 SpaceBeforeSquareBrackets: false
 SpaceInEmptyBlock: false
 SpacesInAngles: Never
-SpacesInLineCommentPrefix: 
+SpacesInLineCommentPrefix:
   Minimum: 1
   Maximum: 1
 SpacesInParens: Custom

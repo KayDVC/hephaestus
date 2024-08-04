@@ -1,0 +1,14 @@
+Submodule Name: MySubmodule
+
+# The following dependencies will resolve to ${PROJECT_NAME}::<dependency>
+Internal Dependencies:
+  - foo    
+
+# The following dependencies are copied exactly as specified.
+External Dependencies:
+  - bar
+
+# The following file (if found in submodule directory) will not be added to the submodule.
+# The same rules also apply to the file's header, so the file extension doesn't need to be specified.
+Exclude Files:
+  - baz

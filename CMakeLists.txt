@@ -29,7 +29,15 @@ endif()
 # Create a unit test build using GTest Framework.
 option(HEPHAESTUS_BUILD_TESTS "Build a unit test executable." OFF)
 
-# All internal includes should be like `#include 'hephaestus/<module>/<headerfile>'
+# Add additional warnings during compilation for ID10T errors.
+if (MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# All includes utilizing Hepheastus's public interfaces should be of the form:
+# `#include 'hephaestus/<module>/<headerfile>'
 include_directories("include")
 
 # Build necessary subdirectories
@@ -46,5 +54,6 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 
 # Create a unit test executable.
 if (HEPHAESTUS_BUILD_TESTS)
+	message("Building unit tests, build test option= ${HEPHAESTUS_BUILD_TESTS}")
     add_subdirectory(test)
 endif()

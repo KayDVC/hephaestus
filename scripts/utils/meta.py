@@ -6,8 +6,10 @@ from pathlib import Path
     Currently includes:
         - Common file locations (absolute)
 """
+
+
 class Meta:
-    ROOT = Path(Path(__file__).parent, "..", "..").resolve()    
+    ROOT = Path(Path(__file__).parent, "..", "..").resolve()
     PINCLUDE = Path(ROOT, "include", "hephaestus")
+    SCRIPTS = Path(ROOT, "scripts")
     SRC = Path(ROOT, "src")
-    

@@ -10,16 +10,17 @@ from .meta import Meta
         - Common file locations (absolute)
 """
 
+
 class Formatter(logging.Formatter):
     """Defines common message format for files."""
 
     # no explicit constructor necessary.
     class Colors:
-        CYAN    = "\033[36m"
-        GREEN   = "\033[32m"
-        RED     = "\033[31m"
-        YELLOW  = "\033[33m"
-        RESET   = "\033[0m"
+        CYAN = "\033[36m"
+        GREEN = "\033[32m"
+        RED = "\033[31m"
+        YELLOW = "\033[33m"
+        RESET = "\033[0m"
 
     minimal_details = "%(levelname)-7s: %(message)s "
     full_details = "%(levelname)-7s [%(asctime)s]: %(message)s (%(name)s:%(lineno)s)"
@@ -43,7 +44,7 @@ class Formatter(logging.Formatter):
         return logging.Formatter(log_format).format(record)
 
 
-def get_logger(verbose:bool=False) -> logging.Logger:
+def get_logger(verbose: bool = False) -> logging.Logger:
     """Creates a log of application activity.
 
     Args:
@@ -53,10 +54,10 @@ def get_logger(verbose:bool=False) -> logging.Logger:
     Returns:
         A logger object that outputs information to standard output.
     """
-    
+
     # ensure logs get propagated upstream
     name = f"{Path(inspect.stack()[1].filename).relative_to(Meta.ROOT)}"
-    
+
     # generate logger object.
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)  # accept all messages globally.
@@ -65,7 +66,9 @@ def get_logger(verbose:bool=False) -> logging.Logger:
 
     # add handler for stdout.
     std_out_handler = logging.StreamHandler()
-    std_out_handler.setLevel(logging.DEBUG if verbose else logging.INFO)  # display messages based on specified verbosity.
+    std_out_handler.setLevel(
+        logging.DEBUG if verbose else logging.INFO
+    )  # display messages based on specified verbosity.
     std_out_handler.setFormatter(log_formatter)
     logger.addHandler(std_out_handler)
 

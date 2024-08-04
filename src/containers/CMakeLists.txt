@@ -1,6 +1,6 @@
 
 ## 
-# Generated using `Generate Submodule Cmake Lists Utility` v1.0.0
+# Generated using `Generate Submodule Cmake Lists Utility` 1.0.0
 ##
 
 # Create a variable to use in place of submodule name
