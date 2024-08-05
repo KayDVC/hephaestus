@@ -1,14 +1,14 @@
-#include <gtest/gtest.h>
 #include "hephaestus/common/sizes.h"
+#include <gtest/gtest.h>
 
 // Demonstrate some basic assertions.
 TEST(HelloTest, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
+    // Expect two strings not to be equal.
+    EXPECT_STRNE("hello", "world");
+    // Expect equality.
+    EXPECT_EQ(7 * 6, 42);
 }
 
 TEST(HelloTest, LinkingTest) {
-  EXPECT_EQ(Hephaestus::KILOBYTE, 1024);
+    EXPECT_EQ(Hephaestus::KILOBYTE, 1024);
 }

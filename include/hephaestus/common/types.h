@@ -1,6 +1,8 @@
 #ifndef HEPHAESTUS_TYPES_H
 #define HEPHAESTUS_TYPES_H
 
+#include <iostream>
+
 namespace Hephaestus {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -11,11 +13,10 @@ namespace Hephaestus {
 /// given enum class type.
 ///////////////////////////////////////////////////////////////////////////////
 // clang-format off: Begin Macro Definition
-#define CREATE_OSTREAM_OPERATOR_ENUM(name)																			\
-template<typename OStream>																							\
-constexpr OStream& operator<<(const OStream& os, const name& value) {												\
-    os << toString(value);																							\	
-    return os;																										\
+#define CREATE_OSTREAM_OPERATOR_ENUM(name)                                                                          \
+constexpr std::ostream& operator<<(std::ostream& os, const name value) {                                            \
+    os << toString(value);                                                                                          \
+    return os;                                                                                                      \
 }
 // clang-format on: End Macro Definition
 
@@ -27,23 +28,23 @@ constexpr OStream& operator<<(const OStream& os, const name& value) {											
 ///////////////////////////////////////////////////////////////////////////////
 // clang-format off: Begin Macro Definition
 #define CREATE_BOOLEAN_OPERATORS_ENUM(name, u_type)                                                                \
-constexpr bool operator==(const name& lhs, const name& rhs) {                                                      \
-	return static_cast<u_type>(lhs) == static_cast<u_type>(rhs);                                                   \
+constexpr bool operator==(const name lhs, const name rhs) {                                                        \
+    return static_cast<u_type>(lhs) == static_cast<u_type>(rhs);                                                   \
 }                                                                                                                  \
-constexpr bool operator!=(const name& lhs, const name& rhs) {                                                      \
-	return !(lhs == rhs);                                                                                          \
+constexpr bool operator!=(const name lhs, const name rhs) {                                                        \
+    return !(lhs == rhs);                                                                                          \
 }                                                                                                                  \
-constexpr bool operator<(const name& lhs, const name& rhs) {                                                       \
-	return static_cast<u_type>(lhs) < static_cast<u_type>(rhs);                                                    \
+constexpr bool operator<( const name lhs, name rhs) {                                                              \
+    return static_cast<u_type>(lhs) < static_cast<u_type>(rhs);                                                    \
 }                                                                                                                  \
-constexpr bool operator>(const name& lhs, const name& rhs) {                                                       \
-	return rhs < lhs;                                                                                              \
+constexpr bool operator>(const name lhs, const name rhs) {                                                         \
+    return rhs < lhs;                                                                                              \
 }                                                                                                                  \
-constexpr bool operator<=(const name& lhs, const name& rhs) {                                                      \
-	return !(lhs > rhs);                                                                                           \
+constexpr bool operator<=(const name lhs, const name rhs) {                                                        \
+    return !(lhs > rhs);                                                                                           \
 }                                                                                                                  \
-constexpr bool operator>=(const name& lhs, const name& rhs) {                                                      \
-	return !(lhs < rhs);                                                                                           \
+constexpr bool operator>=(const name lhs, const name rhs) {                                                        \
+    return !(lhs < rhs);                                                                                           \
 }
 // clang-format on: End Macro Definition
 

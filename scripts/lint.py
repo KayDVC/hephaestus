@@ -27,10 +27,12 @@ def get_cpp_files() -> list[str]:
     files = (
         # Public includes
         list(pathlib.Path(Meta.PINCLUDE).rglob("*.h"))
-        +
         # Source files
-        list(pathlib.Path(Meta.SRC).rglob("*.h"))
+        + list(pathlib.Path(Meta.SRC).rglob("*.h"))
         + list(pathlib.Path(Meta.SRC).rglob("*.cpp"))
+        # Test files
+        + list(pathlib.Path(Meta.TEST).rglob("*.h"))
+        + list(pathlib.Path(Meta.TEST).rglob("*.cpp"))
     )
     return files
 

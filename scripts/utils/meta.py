@@ -13,3 +13,4 @@ class Meta:
     PINCLUDE = Path(ROOT, "include", "hephaestus")
     SCRIPTS = Path(ROOT, "scripts")
     SRC = Path(ROOT, "src")
+    TEST = Path(ROOT, "test")

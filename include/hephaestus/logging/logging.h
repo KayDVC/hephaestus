@@ -24,7 +24,7 @@ enum class LogLevel : uint8_t {
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Potentially useful utilities used enums.
 ///////////////////////////////////////////////////////////////////////////////
-constexpr const char* toString(LogLevel& level) {
+constexpr const char* toString(const LogLevel& level) {
     switch (level) {
         case LogLevel::DEBUG   : return "DEBUG";
         case LogLevel::INFO    : return "INFO";
@@ -49,8 +49,16 @@ class Logger {
     ///
     /// @param _minLevel the lowest level to output. Any levels above level will
     ///	also be output. Defaults to DEBUG.
+    /// @param _out the output stream to log messages to. Defaults to standard
+    /// error.
+    ///
+    /// @note Using a raw pointer rather than a smart pointer is a conscience
+    /// decision here. There's no particular reason why we'd want to delete an
+    /// output stream when this logger object is destructed. The caller assumes
+    /// full responsibility for dealing closing and/or releasing the stream.
+    /// Oh and don't pass a nullptr :).
     ///////////////////////////////////////////////////////////////////////////////
-    explicit Logger(const LogLevel _minLevel = LogLevel::DEBUG);
+    explicit Logger(const LogLevel _minLevel = LogLevel::DEBUG, std::ostream* _out = &std::cerr);
     ~Logger() = default;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -59,7 +67,7 @@ class Logger {
     /// @param minLevel the lowest level to output. Any levels above level will
     ///	also be output.
     ///////////////////////////////////////////////////////////////////////////////
-    void setLevel(const LogLevel& minLevel);
+    void setLevel(const LogLevel minLevel);
 
     ///////////////////////////////////////////////////////////////////////////////
     /// @brief Sets the lowest log level to pipe to output.
@@ -68,17 +76,22 @@ class Logger {
     ///////////////////////////////////////////////////////////////////////////////
     LogLevel getLevel() const;
 
+    // TODO: Cleanup Ostream support. Log function should be using write & flush methods.
+
     ///////////////////////////////////////////////////////////////////////////////
     /// @brief Pipes a message to output based on log level.
     ///
     /// @param level the log message's level.
     /// @param msg 	a string containing the message to output.
+    ///
+    /// @return True if msg successfully written to output stream; false otherwise.
     ///////////////////////////////////////////////////////////////////////////////
-    void log(const LogLevel& level, const std::string& msg) const;
+    bool log(const LogLevel level, const std::string& msg) const;
 
   private:
 
-    LogLevel minLevel;
+    LogLevel      minLevel;
+    std::ostream* out;
 };
 
 // A logger that can be used without any additional configurations.
@@ -91,22 +104,24 @@ const Logger defaultLog { LogLevel::DEBUG };
 /// @param level the log message's level.
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
+///
+/// @return True if formatted message written to output stream; false otherwise.
 ///////////////////////////////////////////////////////////////////////////////
 // clang-format off: Begin Macro Definition
-#define LOG_MSG(logger, level, fmt, ...)                                                                            \
-    logger.log(level, 																								\
-		*(Hephaestus::format(																						\
-			"[%-8s | %s:%d] %s", 																					\
-			Hephaestus::toString(level), 																			\
-			__func__,																								\
-			__LINE__,       																						\
-			Hephaestus::format(fmt, __VA_ARGS__).c_str()															\
-			)																										\
-		)																											\
-	)
+#define HEPHAESTUS_LOG_MSG(logger, level, fmt, ...)                                                                 \
+    logger.log(level,                                                                                               \
+        *(Hephaestus::format(                                                                                       \
+                "[ %-8s | %s:%d ] %s",                                                                              \
+                Hephaestus::toString(level),                                                                        \
+                __func__,                                                                                           \
+                __LINE__,                                                                                           \
+                Hephaestus::format(fmt, __VA_ARGS__)->c_str()                                                       \
+            )                                                                                                       \
+        )                                                                                                           \
+    );
 // clang-format on: End Macro Definition
 
-// Intellisense doesn't pick up on the shared documentation for this block of related macros. 
+// Intellisense doesn't pick up on the shared documentation for this block of related macros.
 // There may be a better way to do this, but for now, copy pasta it is :).
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,35 +130,40 @@ const Logger defaultLog { LogLevel::DEBUG };
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
 ///////////////////////////////////////////////////////////////////////////////
-#define LOG_DEBUG(fmt, ...)    Hephaestus::LOG_MSG(defaultLog, LogLevel::DEBUG, fmt, __VA_ARGS__)
+#define HEPHAESTUS_LOG_DEBUG(fmt, ...)                                                                                 \
+    (void)HEPHAESTUS_LOG_MSG(Hephaestus::defaultLog, LogLevel::DEBUG, fmt, __VA_ARGS__);
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Logs a message at the info level using the default logger.
 ///
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
 ///////////////////////////////////////////////////////////////////////////////
-#define LOG_INFO(fmt, ...)     Hephaestus::LOG_MSG(defaultLog, LogLevel::INFO, fmt, __VA_ARGS__)
+#define HEPHAESTUS_LOG_INFO(fmt, ...)                                                                                  \
+    (void)HEPHAESTUS_LOG_MSG(Hephaestus::defaultLog, LogLevel::INFO, fmt, __VA_ARGS__);
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Logs a message at the warning level using the default logger.
 ///
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
 ///////////////////////////////////////////////////////////////////////////////
-#define LOG_WARN(fmt, ...)     Hephaestus::LOG_MSG(defaultLog, LogLevel::WARNING, fmt, __VA_ARGS__)
+#define HEPHAESTUS_LOG_WARN(fmt, ...)                                                                                  \
+    (void)HEPHAESTUS_LOG_MSG(Hephaestus::defaultLog, LogLevel::WARNING, fmt, __VA_ARGS__);
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Logs a message at the error level using the default logger.
 ///
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
 ///////////////////////////////////////////////////////////////////////////////
-#define LOG_ERROR(fmt, ...)    Hephaestus::LOG_MSG(defaultLog, LogLevel::ERROR, fmt, __VA_ARGS__)
+#define HEPHAESTUS_LOG_ERROR(fmt, ...)                                                                                 \
+    (void)HEPHAESTUS_LOG_MSG(Hephaestus::defaultLog, LogLevel::ERROR, fmt, __VA_ARGS__);
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Logs a message at the critical level using the default logger.
 ///
 /// @param fmt the c-style format template for the log msg.
 /// @param ... a list of parameters to use when formatting the log msg.
 ///////////////////////////////////////////////////////////////////////////////
-#define LOG_CRITICAL(fmt, ...) Hephaestus::LOG_MSG(defaultLog, LogLevel::CRITICAL, fmt, __VA_ARGS__)
+#define HEPHAESTUS_LOG_CRITICAL(fmt, ...)                                                                              \
+    (void)HEPHAESTUS_LOG_MSG(Hephaestus::defaultLog, LogLevel::CRITICAL, fmt, __VA_ARGS__);
 
 }    // namespace Hephaestus
 

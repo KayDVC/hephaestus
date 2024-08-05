@@ -14,6 +14,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(
   hephaestus_test
   hello_test.cpp
+  logging/Test_Logging.cpp
 )
 
 # Add the Hephaestus and GTest library's code to the executable.

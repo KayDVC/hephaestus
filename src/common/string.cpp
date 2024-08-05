@@ -3,12 +3,12 @@
 
 #include "hephaestus/common/string.h"
 
-using string  = std::string;
-using str_ptr = std::shared_ptr<string>;
+using String    = std::string;
+using StringPtr = std::shared_ptr<String>;
 
 namespace Hephaestus {
 
-str_ptr format(const char* fmt, ...) {
+StringPtr format(const char* fmt, ...) {
 
     // Create argument list and allow traversal. Note: fmt and remaining args
     // are all considered part of the argument list, but, making them separate,
@@ -27,7 +27,7 @@ str_ptr format(const char* fmt, ...) {
     va_end(argsCopy);
 
     // Create a new string with the desired format and values.
-    str_ptr sPtr = std::make_shared<string>(string(formattedSize, 0));
+    StringPtr sPtr = std::make_shared<String>(String(formattedSize, 0));
     (void)std::vsnprintf((*sPtr).data(), formattedSize, fmt, args);
     va_end(args);
 
