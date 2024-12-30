@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+
+import argparse
+import logging
+import sys
+import textwrap
+
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parents[1]))
+from hephaestus._internal.meta import Paths
+from hephaestus.util.logging import get_logger, configure_root_logger
+
+# Constants
+VERSION = "1.0.0"
+LOG_FILE = Path(Paths.LOGS, "PyTest.log")
+
+fail = lambda: exit(1)
+logger = get_logger(root=Paths.ROOT)
+
+# We're running PyTest like regular Python functions here so we can hijack the config options
+# for the script. This means we'll have to do some late imports which I don't particularly like,
+# but it's a small tradeoff.
+
+
+def run_test_suite(with_color: bool):
+    """Uses PyTest to run the test suite.
+
+    Args:
+        with_color: whether to color output to stdout.
+    """
+    import pytest
+
+    logger.info("Starting test suite.")
+
+    pytest_args = [
+        "--quiet",
+        "-rpfs",  # Show extra summary info for Passed, Failed, and Skipped tests at the end of running.
+        "--capture=no",  # Disable capturing output to stdout/stderr.
+        "--show-capture=no",  # Don't repeat logs for failed tests.
+        "--random-order-bucket=class",  # Run related tests together. Requires pytest-random-order,
+        f"--color={'yes' if with_color else 'no'}",
+        Paths.LIB,
+    ]
+
+    pytest.main(pytest_args)
+
+
+def _check_pytest_installation():
+    """Verifies system has Pytest Installed"""
+    logger.debug("Verifying Pytest installation")
+
+    # TODO: Verify pytest plugins installed too.
+    try:
+        import pytest
+    except ImportError:
+        logger.error("Could not find PyTest. Is it installed on this machine?")
+        fail()
+
+
+def run():
+    parser = argparse.ArgumentParser(
+        prog="Run Hephaestus Test Suite",
+        description="Runs the test suite using PyTest.",
+        usage=textwrap.dedent(
+            """
+            scripts/run_pytest
+            """
+        ),
+    )
+
+    parser.add_argument(
+        "--disable-color",
+        help="Disable colored output to standard out",
+        required=False,
+        dest="disable_color",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-vv",
+        "--verbose",
+        help="output debug messages",
+        required=False,
+        dest="verbose",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="print the version of the script",
+        required=False,
+        dest="version",
+        action="store_true",
+    )
+
+    args = parser.parse_args()
+
+    if args.version:
+        print(VERSION)
+        exit(0)
+
+    configure_root_logger(
+        min_level=logging.DEBUG if args.verbose else logging.INFO,
+        log_file=LOG_FILE,
+        color=(not args.disable_color),
+    )
+    
+    logger.info("Script Configuration")
+    logger.info(f"Color Enabled: {str(not args.disable_color)}")
+    logger.info(f"Verbose Output: {str(args.verbose)}")
+    logger.info(f"Log File: {str(LOG_FILE)}")
+    
+    _check_pytest_installation()
+    run_test_suite(with_color=(not args.disable_color))
+
+
+if __name__ == "__main__":
+    run()

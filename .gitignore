@@ -169,3 +169,18 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Software logs
+/**/logs
+
+# OS-specific files
+/**/.DS_Store
+
+# Temp folders
+**/temp
+
+# Sphinx (Documentation)
+config/sphinx/source/*
+!config/sphinx/source/conf.py
+!config/sphinx/source/index.rst
+docs
