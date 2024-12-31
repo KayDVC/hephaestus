@@ -1,5 +1,22 @@
 import logging
-import inspect
+from typing import Any, Optional
+
+
+class NullStreamer:
+    """A streaming interface that does not output.
+
+    This class should only be used where a FileIO object is necessary, but output is not wanted.
+    """
+
+    def write(self, msg: Any, *args):
+        pass
+
+    def flush(self):
+        pass
+
+    def isatty(self) -> bool:
+        return True
+
 
 class LogStreamer:
     """A streaming interface that enables write operations directly to logger object.
@@ -9,17 +26,20 @@ class LogStreamer:
         """
         Args:
             logger: the logger object to stream output to.
-            log_level: the logging level to stream output at. Defaults to logging.INFO.
+            log_level: the default logging level to stream output at. Defaults to logging.INFO.
         """
         self._logger = logger
         self._log_level = log_level
         
-    def write(self, msg, *args):
+    def write(self, msg: Any, *args, log_level: Optional[int] = None):
         """Logs passed information at specified level.
+        
+        log_level: the logging level to stream output at. Defaults the object's log_level.
         """
-        # msg = str(msg).strip()
-        if len(msg) > 0:
-            self._logger.log(level=self._log_level, msg = msg, *args)
+        if not log_level:
+            log_level = self._log_level
+        
+        self._logger.log(level=log_level, msg = msg, *args)
         
     def flush(self):
         """Flushes the handlers for each stream available to the logger.

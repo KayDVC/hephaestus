@@ -124,7 +124,7 @@ def run():
     configure_root_logger(
         min_level=logging.DEBUG if args.verbose else logging.INFO,
         log_file=LOG_FILE,
-        color=(not args.disable_color),
+        enable_color=(not args.disable_color),
     )
     
     _check_sphinx_installation()

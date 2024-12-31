@@ -4,7 +4,7 @@ import sys
 import time
 
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 from hephaestus.common.types import PathLike
 from hephaestus.common.colors import Colors
@@ -16,70 +16,93 @@ from hephaestus.common.colors import Colors
     their use would cause a circular dependency.
 """
 
+# Allow users to override default color for log levels.
+_original_record_factory = logging.getLogRecordFactory()
+def record_factory(*args, **kwargs):
+    record = _original_record_factory(*args, **kwargs)
+    if color_override := kwargs.get("color", None):
+        record.color = color_override
+    return record
+logging.setLogRecordFactory(record_factory)
+
+class FormatOptions:
+    """Format Options for a logging.Formatter.
+    
+    Args:
+        fmt: the format string to use
+        default_color: the ANSI color code used to color output.
+        style: the 'format' style to use. '{', '%'
+    """
+    def __init__(self, fmt: str, default_color: str, style: str):
+        self.fmt = fmt
+        self.default_color = default_color
+        self.style = style
+
 ##
 # Formatting
 ##
-class _LogFormatter(logging.Formatter):
-    """Defines common message format for files."""
+class LogFormatter(logging.Formatter):
+    """Defines common message format for files.
+    
+    Args:
+        enable_color: whether formatter should include ASCII-based coloring.
+        time_expr: the method to convert seconds since epoch to a time.struct_time object.
+        fmt_opts: a mapping of the format options to use for each level.
+    """
 
-    _FMT = "[{asctime}] {levelname:7}: {message} ({name}:{funcName}:{lineno})"
-
-    _COLORED_FORMATS = {
-        logging.DEBUG: Colors.GREEN + _FMT + Colors.RESET,
-        logging.INFO: Colors.CYAN + _FMT + Colors.RESET,
-        logging.WARNING: Colors.YELLOW + _FMT + Colors.RESET,
-        logging.ERROR: Colors.RED + _FMT + Colors.RESET,
+    _SHORT_FMT = "[{asctime}] {levelname:7}: {message}" 
+    _VERBOSE_FMT = f"{_SHORT_FMT} ({{name}}:{{funcName}}:{{lineno}})"
+    _FMT_STYLE = "{"
+    
+    DEFAULT_ENABLE_COLOR = True
+    DEFAULT_TIME_EXPR = time.gmtime
+    DEFAULT_FORMAT_OPTS = {
+        logging.DEBUG: FormatOptions(fmt=_VERBOSE_FMT, default_color=Colors.MAGENTA, style=_FMT_STYLE),
+        logging.INFO: FormatOptions(fmt=_SHORT_FMT, default_color=Colors.CYAN, style=_FMT_STYLE),
+        logging.WARNING: FormatOptions(fmt=_VERBOSE_FMT, default_color=Colors.YELLOW, style=_FMT_STYLE),
+        logging.ERROR: FormatOptions(fmt=_VERBOSE_FMT, default_color=Colors.RED, style=_FMT_STYLE),
+        logging.CRITICAL: FormatOptions(fmt=_VERBOSE_FMT, default_color=Colors.RED, style=_FMT_STYLE)
     }
 
-    _PLAIN_FORMATS = {
-        logging.DEBUG: _FMT,
-        logging.INFO: _FMT,
-        logging.WARNING: _FMT,
-        logging.ERROR: _FMT,
-    }
-
-    def __init__(self, color: bool, time_expr: Callable):
-        """
-        Args:
-            color: whether formatter should include ASCII-based coloring.
-            time_expr: the method to convert seconds since epoch to a time.struct_time object.
-        """
+    def __init__(self, enable_color: Optional[bool] = True, time_expr: Optional[Callable] = None, fmt_opts: Optional[dict[int, FormatOptions]] = None):
         super().__init__()
-        self._time_expr = time_expr
-        self._formatters = self._construct_formatters(self._COLORED_FORMATS if color else self._PLAIN_FORMATS)
+        self._enable_color = enable_color
+        self._time_expr = time_expr if time_expr else self.DEFAULT_TIME_EXPR
+        self._formatters = self._construct_formatters(fmt_opts)
 
-    def _create_formatter(self, fmt: str) -> logging.Formatter:
+    def _create_formatter(self, fmt: str, style:str) -> logging.Formatter:
         """Creates log formatters from string and time expression method.
 
         Args:
             fmt: the template for the formatter as defined in logging docs.
-            time_expr: the method to convert seconds since epoch to a time.struct_time object.
+            style: the 'format' style to use. '{', '%'.
 
         Returns:
             A ready-to-go formatting object.
         """
-
-        formatter = logging.Formatter(fmt=fmt, style="{")
-
-        # Express log time in UTC rather than local time
+        formatter = logging.Formatter(fmt=fmt, style=style)
         formatter.converter = self._time_expr
 
         return formatter
 
     def _construct_formatters(
-        self, fmt_dict: dict[int, str]
+        self, fmt_opts: dict[int, FormatOptions]
     ) -> dict[int, logging.Formatter]:
         """Creates formatter objects.
 
         Args:
-            fmt_dict: a mapping of format template to each log level.
+            fmt_opts: a mapping of the format options to use for each level.
 
         Returns:
             A formatter object for each log level with the specified template.
         """
+        if not fmt_opts:
+            fmt_opts = self.DEFAULT_FORMAT_OPTS
+            
         formatters = {}
-        for level, fmt in fmt_dict.items():
-            formatters[level] = self._create_formatter(fmt)
+        for level, opts in fmt_opts.items():
+            fmt = opts.fmt
+            formatters[level] = self._create_formatter(fmt, opts.style)
 
         return formatters
 
@@ -92,7 +115,12 @@ class _LogFormatter(logging.Formatter):
         Returns:
             A formatted string.
         """
-        return self._formatters[record.levelno].format(record)
+        formatted_str = self._formatters[record.levelno].format(record)
+
+        if not self._enable_color:
+            return formatted_str
+
+        return f"{getattr(record, "color", self.DEFAULT_FORMAT_OPTS[record.levelno].default_color)}{formatted_str}{Colors.RESET}"
 
 
 ##
@@ -125,21 +153,22 @@ def _create_log_folder(log_file: Path) -> bool:
     # TODO: return true only if directory exists and program is able to write to it.
     return log_file.parent.exists()
 
-
 def configure_root_logger(
     min_level: int = logging.INFO,
     log_file: PathLike = None,
-    color: bool = True,
-    time_expr: Callable = time.gmtime,
+    enable_color: Optional[bool] = LogFormatter.DEFAULT_ENABLE_COLOR,
+    time_expr: Optional[Callable] = LogFormatter.DEFAULT_TIME_EXPR,
+    fmt_opts: Optional[dict[int, FormatOptions]] = LogFormatter.DEFAULT_FORMAT_OPTS,
 ):
     """Configures logger that ever other logger propagates up to.
 
     Args:
         min_level: the minimum log level to pipe to stdout. Defaults to logging.INFO.
         log_file: the absolute path to the log file to generate. Defaults to None.
-        color: whether output to stdout should be colored. Defaults to True.
+        enable_color: whether output to stdout should be colored. Defaults to LogFormatter.DEFAULT_ENABLE_COLOR.
         time_expr: a method that converts the seconds since the epoch to a time.struct_time
-            object. Defaults to time.gmtime
+            object. Defaults to LogFormatter.DEFAULT_TIME_EXPR.
+        fmt_opts: a mapping of the format options to use for each level. Defaults to LogFormatter.DEFAULT_FMT_OPTS.
 
     Note:
         If log_file is provided, a file will attempt to be generated. Logs saved to file will never
@@ -181,13 +210,14 @@ def configure_root_logger(
     # Apply common configurations and add to logger object.
     for handler in handlers:
         handler.setFormatter(
-            _LogFormatter(
-                color=(
+            LogFormatter(
+                enable_color=(
                     False
-                    if (isinstance(handler, logging.FileHandler) or (not color))
+                    if (isinstance(handler, logging.FileHandler) or (not enable_color))
                     else True
                 ),
                 time_expr=time_expr,
+                fmt_opts=fmt_opts,
             )
         )
         logger.addHandler(handler)

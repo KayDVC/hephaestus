@@ -7,7 +7,7 @@ from hephaestus.common.exceptions import LoggedException
 from hephaestus.util.logging import get_logger
 from hephaestus.io.stream import LogStreamer
 
-__logger = get_logger(__name__)
+_logger = get_logger(__name__)
 
 # TODO: option to pass the information of the actual caller 
 def _exec(cmd: list[Any], enable_output: bool = False, log_level: int = logging.DEBUG, *args, **kwargs) -> list[str]:
@@ -30,7 +30,7 @@ def _exec(cmd: list[Any], enable_output: bool = False, log_level: int = logging.
     
     # Avoid any non-string shenanigans when printing/executing command.
     cmd = [str(arg) for arg in cmd]
-    __logger.debug(f"Running cmd: `{' '.join(cmd)}`")
+    _logger.debug(f"Running cmd: `{' '.join(cmd)}`")
     
     # Capture all output.
     kwargs["stdout"] = subprocess.PIPE
@@ -48,11 +48,11 @@ def _exec(cmd: list[Any], enable_output: bool = False, log_level: int = logging.
     try:
         with subprocess.Popen(cmd, *args, **kwargs) as process:
             if enable_output:
-                __logger.log(level=log_level, msg="Cmd Output:")
+                _logger.log(level=log_level, msg="Cmd Output:")
                 for line in process.stdout:
                     line = line.strip()
                     cmd_output.append(line)
-                    __logger.log(level=log_level, msg=line)
+                    _logger.log(level=log_level, msg=line)
             else:
                 for line in process.stdout:
                     line = line.strip()

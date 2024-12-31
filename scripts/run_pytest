@@ -22,6 +22,17 @@ logger = get_logger(root=Paths.ROOT)
 # for the script. This means we'll have to do some late imports which I don't particularly like,
 # but it's a small tradeoff.
 
+def _check_pytest_installation():
+    """Verifies system has Pytest Installed"""
+    logger.debug("Verifying Pytest installation")
+
+    # TODO: Verify pytest plugins installed too.
+    try:
+        import pytest
+    except ImportError:
+        logger.error("Could not find PyTest. Is it installed on this machine?")
+        fail()
+        
 
 def run_test_suite(with_color: bool):
     """Uses PyTest to run the test suite.
@@ -44,19 +55,6 @@ def run_test_suite(with_color: bool):
     ]
 
     pytest.main(pytest_args)
-
-
-def _check_pytest_installation():
-    """Verifies system has Pytest Installed"""
-    logger.debug("Verifying Pytest installation")
-
-    # TODO: Verify pytest plugins installed too.
-    try:
-        import pytest
-    except ImportError:
-        logger.error("Could not find PyTest. Is it installed on this machine?")
-        fail()
-
 
 def run():
     parser = argparse.ArgumentParser(
@@ -102,7 +100,7 @@ def run():
     configure_root_logger(
         min_level=logging.DEBUG if args.verbose else logging.INFO,
         log_file=LOG_FILE,
-        color=(not args.disable_color),
+        enable_color=(not args.disable_color),
     )
     
     logger.info("Script Configuration")

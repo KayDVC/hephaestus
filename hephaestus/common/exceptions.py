@@ -8,8 +8,8 @@ class LoggedException(Exception):
     exceptions. It logs the error message for later viewing.
     """
 
-    __logger = getLogger(__name__)
+    _logger = getLogger(__name__)
 
     def __init__(self, msg: str = None):
-        self.__logger.error(msg)
+        self._logger.error(msg)
         super().__init__(msg)

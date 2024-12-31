@@ -5,7 +5,7 @@ from typing import Callable
 from hephaestus.util.logging import get_logger
 from hephaestus.patterns.singleton import Singleton
 
-__logger = get_logger(__name__)
+_logger = get_logger(__name__)
 
 ##
 # Public
@@ -56,7 +56,7 @@ def track(to_track: Callable) -> Callable:
 
     def wrapper(*args, **kwargs):
         """Forward all function parameters to wrapped function."""
-        __logger.debug(
+        _logger.debug(
             f"Traced method: {to_track.__name__}, Args: {args}, Keyword Args: {kwargs}"
         )
 
@@ -68,7 +68,7 @@ def track(to_track: Callable) -> Callable:
             )
         )
 
-        __logger.debug(f"Method returned. Return value: {retval}")
+        _logger.debug(f"Method returned. Return value: {retval}")
         return retval
 
     return wrapper

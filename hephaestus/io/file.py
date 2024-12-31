@@ -5,7 +5,7 @@ from hephaestus.common.exceptions import LoggedException
 from hephaestus.common.types import PathLike
 from hephaestus.util.logging import get_logger
 
-__logger = get_logger(__name__)
+_logger = get_logger(__name__)
 
 ##
 # Public
@@ -37,7 +37,7 @@ def validate_path(path: PathLike) -> Path:
 
     # Convert to Path object with absolute path.
     path = Path(path).resolve()
-    __logger.debug(f"Attempting to find path: {path}")
+    _logger.debug(f"Attempting to find path: {path}")
 
     # Ensure path actually exists.
     if not path.exists():
@@ -60,7 +60,7 @@ def create_directory(path: PathLike) -> Path:
     """
     # Convert to Path object with absolute path.
     path = Path(path).resolve()
-    __logger.debug(f"Attempting to create directory: {path}")
+    _logger.debug(f"Attempting to create directory: {path}")
     
     path.mkdir(parents=True, exist_ok=True)
     

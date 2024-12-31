@@ -5,7 +5,7 @@ from typing import Any, Callable, Type
 
 from hephaestus.common.exceptions import LoggedException
 
-__logger = getLogger(__name__)
+_logger = getLogger(__name__)
 
 # Internal "cache" of defined getters and ignores for each parent.
 __cls_maps: dict[str, "__ReferenceMap"] = {}
@@ -57,7 +57,7 @@ def __method_wrapper(getter: Callable, if_none: Callable, method_name: str) -> C
     def _wrapper(self, *args, **kwargs) -> Any:
         obj = getter(self)
         if not obj:
-            __logger.debug("Referenced object is null.")
+            _logger.debug("Referenced object is null.")
             return if_none()
         return getattr(obj, method_name)(*args, **kwargs)
 

@@ -1,3 +1,4 @@
+import pytest
 from hephaestus.patterns.singleton import Singleton
 
 
