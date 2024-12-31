@@ -7,7 +7,6 @@ class NullStreamer:
 
     This class should only be used where a FileIO object is necessary, but output is not wanted.
     """
-
     def write(self, msg: Any, *args):
         pass
 
@@ -39,7 +38,8 @@ class LogStreamer:
         if not log_level:
             log_level = self._log_level
         
-        self._logger.log(level=log_level, msg = msg, *args)
+        if str(msg).strip() != 0:
+            self._logger.log(level=log_level, msg = msg, *args)
         
     def flush(self):
         """Flushes the handlers for each stream available to the logger.

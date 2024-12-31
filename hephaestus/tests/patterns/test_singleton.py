@@ -1,10 +1,8 @@
-import pytest
-from hephaestus.patterns.singleton import Singleton
 
+from hephaestus.patterns.singleton import Singleton
 
 class FakeClassOne(metaclass=Singleton):
     pass
-
 
 class FakeClassTwo(metaclass=Singleton):
     pass

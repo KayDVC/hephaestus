@@ -21,17 +21,13 @@ def module_logger(request: _pytest.fixtures.SubRequest):
 
 
 @pytest.fixture(scope="function", autouse=True)
-def logger(request: _pytest.fixtures.SubRequest, module_logger: logging.Logger):
-    """Logs each function's docstring and provides the module's logger.
+def logger(module_logger: logging.Logger):
+    """Provides the module's logger.
 
     Args:
-        request: the request fixture that gives access to the calling function.
         module_logger: the logger generated for the module.
 
     Yields:
         A ready-to-use logger object.
     """
-    module_logger.info(f"Name: {request.function.__name__}")
-    module_logger.info(f"Description: {request.function.__doc__}")
-
     yield module_logger
