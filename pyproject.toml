@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hephaestus-lib"
+version = "0.1.1"
+readme = "README.md"
+authors = [
+    {name="Malakai Spann", email="MalakaiSpann@gmail.com"}
+]
+
+description = "A collection of useful Python Classes, Functions, and Constants"
+requires-python = ">=3.6"
+license = {file = "LICENSE"}
+classifiers = [
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Software Development',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+]
+
+[project.urls]
+Repository = "https://github.com/KayDVC/hephaestus/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hephaestus.*"]
+exclude = ["hephaestus.tests*", "hephaestus*.__pycache__*", "hephaestus._internal*"]
+namespaces = true 
