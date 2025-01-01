@@ -19,6 +19,7 @@ PathLike: A string, Path, or similar representation of a file path.
 
 class FileError(LoggedException):
     """Indicates an error has occurred while attempting a file operation."""
+
     pass
 
 
@@ -45,26 +46,27 @@ def validate_path(path: PathLike) -> Path:
 
     return path
 
+
 def create_directory(path: PathLike) -> Path:
     """Attempts to create directory at specified location.
 
     Args:
         folder: the path to the directory.
-        
+
     Returns:
         A Path object with the path to the directory.
 
     Raises:
         FileError if directory creation failed.
-    
+
     """
     # Convert to Path object with absolute path.
     path = Path(path).resolve()
     _logger.debug(f"Attempting to create directory: {path}")
-    
+
     path.mkdir(parents=True, exist_ok=True)
-    
+
     if not path.exists():
         raise FileError(f"Failed to create directory : {str(path)}.")
-        
+
     return path

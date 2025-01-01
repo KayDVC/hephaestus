@@ -5,9 +5,11 @@ MAX_PRINT_WIDTH = 80
 LARGE_DIVIDER = "=" * int(MAX_PRINT_WIDTH / 2)
 SMALL_DIVIDER = "-" * MAX_PRINT_WIDTH
 
+
 class Constants:
     MAGIC_STRING_ONE = "DEADBEEF"
     MAGIC_STRING_TWO = "BADDCAFE"
+
 
 ##
 # Logging Functions

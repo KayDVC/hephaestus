@@ -81,6 +81,7 @@ test_results: dict[str, dict[str, TestResult]] = {
 # Keep running tally of execution time excluding overhead.
 test_execution_time: float = 0.00
 
+
 ##
 # Utility
 ##

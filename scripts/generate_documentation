@@ -21,6 +21,7 @@ LOG_FILE = Path(Paths.LOGS, "GenerateDocumentation.log")
 fail = lambda: exit(1)
 logger = get_logger(__name__)
 
+
 def generate_rst_files():
     """Creates ReStructuredText files from source code docstrings."""
     logger.info("Creating ReStructured Text Files.")
@@ -29,54 +30,59 @@ def generate_rst_files():
         str(Paths.LIB),
         "--output-dir",
         str(Path(Paths.SPHINX, "source")),
-        "--module-first",   # Generate module documentation before generating submodule docs.
-        "--force",          # Overwrite existing rst files.
-        "--separate",       # Generate a file for each module
-        "--implicit-namespaces", # Who wants to stick __init__.py everywhere.
+        "--module-first",  # Generate module documentation before generating submodule docs.
+        "--force",  # Overwrite existing rst files.
+        "--separate",  # Generate a file for each module
+        "--implicit-namespaces",  # Who wants to stick __init__.py everywhere.
     ]
-    
+
     run_command(cmd, err="Failed to create ReStructured Text files.")
-    
+
 
 def generate_html():
     """Creates HTML from ReStructuredText files."""
     logger.info("Creating HTML Files.")
-    
+
     # Ensure docs folder exists.
     docs_dir = str(create_directory(Paths.DOCS))
-    
+
     # Make commands to generate HTML. Note, we change the output dir of HTML files.
     cmd_sets = [
-        {"cmd": ["make","clean", f"BUILDDIR={docs_dir}"], "on_error": "Failed to clean make environment."},
-        {"cmd": ["make","html", f"BUILDDIR={docs_dir}"], "on_error": "Failed to create html files."},
-        
+        {
+            "cmd": ["make", "clean", f"BUILDDIR={docs_dir}"],
+            "on_error": "Failed to clean make environment.",
+        },
+        {
+            "cmd": ["make", "html", f"BUILDDIR={docs_dir}"],
+            "on_error": "Failed to create html files.",
+        },
     ]
-    
+
     # Change directory to avoid OS-specific login.
     current_dir = Path.cwd()
     os.chdir(Paths.SPHINX)
-    
+
     # Run commands changing back to previous directory on failure.
     for cmd_set in cmd_sets:
-        run_command(cmd_set["cmd"], err=cmd_set["on_error"], cleanup=lambda: os.chdir(current_dir))
-    
+        run_command(
+            cmd_set["cmd"],
+            err=cmd_set["on_error"],
+            cleanup=lambda: os.chdir(current_dir),
+        )
+
     os.chdir(current_dir)
     logger.info(f"HTML files available here: {docs_dir}")
-    
+
 
 def _check_sphinx_installation():
     """Verifies system has Sphinx Installed"""
     logger.debug("Verifying Sphinx Apidoc installation")
 
-    cmd = [
-        "sphinx-apidoc",
-        "--version"
-    ]
-    
+    cmd = ["sphinx-apidoc", "--version"]
+
     if not command_successful(cmd):
         logger.error("Could not find Sphinx Apidoc. Is it installed on this machine?")
         fail()
-
 
 
 def run():
@@ -126,7 +132,7 @@ def run():
         log_file=LOG_FILE,
         enable_color=(not args.disable_color),
     )
-    
+
     _check_sphinx_installation()
     generate_rst_files()
     generate_html()

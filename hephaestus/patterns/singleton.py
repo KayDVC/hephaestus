@@ -6,6 +6,7 @@ _logger = get_logger(__name__)
 
 _singleton_lock = Lock()
 
+
 class Singleton(type):
     """A Pythonic, thread-safe implementation of the Singleton pattern.
 
@@ -32,9 +33,12 @@ class Singleton(type):
             # Acquire lock and re-check, creating instance as necessary.
             with _singleton_lock:
                 if cls not in cls.__shared_instances:
-                    
-                    _logger.debug(f"Shared instance not available for {cls.__name__}. Creating...", stacklevel=2)
-                    
+
+                    _logger.debug(
+                        f"Shared instance not available for {cls.__name__}. Creating...",
+                        stacklevel=2,
+                    )
+
                     cls.__shared_instances[cls] = super(Singleton, cls).__call__(
                         *args, **kwargs
                     )

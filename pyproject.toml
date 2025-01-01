@@ -9,6 +9,7 @@ readme = "README.md"
 authors = [
     {name="Malakai Spann", email="MalakaiSpann@gmail.com"}
 ]
+
 description = "A collection of useful Python Classes, Functions, and Constants"
 requires-python = ">=3.6"
 license = {file = "LICENSE"}
@@ -25,6 +26,9 @@ classifiers = [
     'Operating System :: Unix',
     'Operating System :: MacOS',
 ]
+
+[project.urls]
+Repository = "https://github.com/KayDVC/hephaestus/"
 
 [tool.setuptools.packages.find]
 where = ["."]
