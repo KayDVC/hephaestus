@@ -3,14 +3,16 @@ import subprocess
 
 from typing import Any, Callable
 
-from hephaestus.common.exceptions import LoggedException
+from hephaestus.common.exceptions import LoggedException, _InternalError
 from hephaestus.util.logging import get_logger
-from hephaestus.io.stream import LogStreamer
 
 _logger = get_logger(__name__)
 
 
 # TODO: option to pass the information of the actual caller
+class _SubprocessError(Exception):
+    pass
+
 def _exec(
     cmd: list[Any],
     enable_output: bool = False,
@@ -24,6 +26,10 @@ def _exec(
         cmd: the command to run.
         enable_output: whether to log captured output.
         log_level: the level to log cmd output at. Ignored if enable_output set to False. Defaults to DEBUG.
+    
+    Raises:
+        _Subprocess_Error if the command fails after running.
+        Any other exception thrown means there was an issue in the Python runtime logic.
 
     Returns:
         The output of the cmd as captured line-by-line. If the command was unsuccessful, None will be returned.
@@ -49,11 +55,12 @@ def _exec(
     # Make line endings OS-agnostic
     kwargs["universal_newlines"] = True
 
-    # The performance might matter enough here to repeat myself :(.
-    cmd_output = []
-    retcode = None
     try:
+        cmd_output = []
+        retcode = None
         with subprocess.Popen(cmd, *args, **kwargs) as process:
+            
+            # The performance might matter enough here to repeat myself :(.
             if enable_output:
                 _logger.log(level=log_level, msg="Cmd Output:")
                 for line in process.stdout:
@@ -62,14 +69,18 @@ def _exec(
                     _logger.log(level=log_level, msg=line)
             else:
                 for line in process.stdout:
-                    line = line.strip()
-                    cmd_output.append(line)
+                    cmd_output.append(line.strip())
 
             retcode = process.wait()
-    except Exception:
-        pass
+    
+    # Seriously bad juju here: the code is FUBAR, not the command. Log it.
+    except Exception as e:
+       raise _InternalError(e)
+    
+    if retcode != 0:
+        raise _SubprocessError
 
-    return cmd_output if retcode == 0 else None
+    return cmd_output
 
 
 ##
@@ -77,7 +88,6 @@ def _exec(
 ##
 class SubprocessError(LoggedException):
     """Indicates an unexpected error has occurred while attempting a subprocess operation."""
-
     pass
 
 
@@ -91,9 +101,16 @@ def command_successful(cmd: list[Any]):
         This function doesn't capture or return any command output.
         It's intended to be used in pass/fail-type scenarios involving subprocesses.
     """
-
-    return _exec(cmd, enable_output=False) is not None
-
+    
+    success = True
+    
+    try:
+        _exec(cmd, enable_output=False) is not None
+    except _SubprocessError:
+        success = False
+        
+    return success
+        
 
 def run_command(
     cmd: list[Any],
@@ -109,12 +126,12 @@ def run_command(
     Args:
         cmd: the command to run.
         err: the error to display if the command fails.
-        cleanup: the function to run in the event of a failure.
+        cleanup: the function to run in the event of a failure. Defaults to None.
         enable_output: whether to log captured output. Defaults to True.
         log_level: the level to log cmd output at. Ignored if enable_output set to False. Defaults to DEBUG.
 
     Raises:
-        SubprocessError if the command fails for any reason.
+        SubprocessError if the command fails to return a "success" status.
 
     Notes:
         This function overwrites various commonly set arguments to subprocess.run/subprocess.popen including
@@ -123,14 +140,58 @@ def run_command(
         Users should only expect `enable_output` to change the behavior of what's actually output.
     """
     try:
-        if (
-            _exec(
-                cmd, enable_output=enable_output, log_level=log_level, *args, **kwargs
-            )
-            is None
-        ):
-            raise SubprocessError(err)
-    except SubprocessError:
+        _ = _exec(
+            cmd, enable_output=enable_output, log_level=log_level, *args, **kwargs
+        )
+        
+    # Execute cleanup on most exceptions, if available.
+    except Exception as e:
         if cleanup:
             cleanup()
-        raise
+        
+        # Command failed after running. Log user provided error message.
+        if isinstance(e, _SubprocessError):
+            raise SubprocessError(err)
+        
+        # Panic
+        raise 
+
+def get_command_output(
+    cmd: list[Any],
+    err: str,
+    cleanup: Callable = None,
+    *args,
+    **kwargs,):
+    """Runs command and logs output as specified.
+
+    Args:
+        cmd: the command to run.
+        err: the error to display if the command fails.
+        cleanup: the function to run in the event of a failure. Defaults to None.
+
+    Raises:
+        SubprocessError if the command fails to return a "success" status.
+
+    Notes:
+        Output via logging is completely disabled here. It's up to the user to 
+        log the command's output.
+    """
+    try:
+        output = _exec(
+            cmd, enable_output=False, log_level=None, *args, **kwargs
+        )
+    
+    # Execute cleanup on most exceptions, if available.
+    except Exception as e:
+        if cleanup:
+            cleanup()
+        
+        # Command failed after running. Log user provided error message.
+        if isinstance(e, _SubprocessError):
+            raise SubprocessError(err)
+        
+        # Panic
+        raise 
+    
+    return output
+    

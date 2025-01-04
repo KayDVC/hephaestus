@@ -58,7 +58,7 @@ class LogFormatter(logging.Formatter):
     """
 
     _SHORT_FMT = "[{asctime}] {levelname:7}: {message}"
-    _VERBOSE_FMT = f"{_SHORT_FMT} ({{name}}:{{funcName}}:{{lineno}})"
+    _VERBOSE_FMT = f"{_SHORT_FMT} ({{module}}:{{funcName}}:{{lineno}})"
     _FMT_STYLE = "{"
 
     DEFAULT_ENABLE_COLOR = True

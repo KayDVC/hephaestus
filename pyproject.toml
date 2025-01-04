@@ -33,5 +33,5 @@ Repository = "https://github.com/KayDVC/hephaestus/"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["hephaestus.*"]
-exclude = ["hephaestus.tests*", "hephaestus*.__pycache__*", "hephaestus._internal*"]
+exclude = ["hephaestus.tests*", "hephaestus*.__pycache__*"]
 namespaces = true 

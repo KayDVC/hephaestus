@@ -32,8 +32,9 @@ def generate_rst_files():
         str(Path(Paths.SPHINX, "source")),
         "--module-first",  # Generate module documentation before generating submodule docs.
         "--force",  # Overwrite existing rst files.
-        "--separate",  # Generate a file for each module
-        "--implicit-namespaces",  # Who wants to stick __init__.py everywhere.
+        "--separate",           # Generate a file for each module
+        "--implicit-namespaces",  # Who wants to stick __init__.py everywhere.,
+        "--private",                # I have the memory of a goldfish. Include private docs too.
     ]
 
     run_command(cmd, err="Failed to create ReStructured Text files.")
@@ -61,6 +62,7 @@ def generate_html():
     # Change directory to avoid OS-specific login.
     current_dir = Path.cwd()
     os.chdir(Paths.SPHINX)
+    logger.debug(f"Current dir: {Path.cwd().resolve()}")
 
     # Run commands changing back to previous directory on failure.
     for cmd_set in cmd_sets:
