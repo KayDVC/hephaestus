@@ -9,7 +9,7 @@ from collections import namedtuple
 from typing import Any
 
 from hephaestus.io.stream import LogStreamer, NullStreamer
-from hephaestus.util.logging import get_logger, LogFormatter
+from hephaestus.io.logging import get_logger, LogFormatter
 
 # PyTest Devs think everything should be private for some reason.
 import _pytest
@@ -93,7 +93,7 @@ def _get_failure_repr(report: _pytest.reports.TestReport) -> str:
     """
     return "\n".join(
         report.longreprtext.splitlines()[1:]
-    )  # The first line is an address to the function which is not useful
+    )  # The first line is an address to the method which is not useful
 
 
 @pytest.hookimpl(trylast=True)  # Going last ensures out removal is not overridden.
@@ -116,15 +116,15 @@ def pytest_configure(config: _pytest.config.Config) -> None:
 
 @pytest.hookimpl(wrapper=True, trylast=True)
 def pytest_runtest_makereport(item: _pytest.nodes.Item, call: _pytest.runner.CallInfo[None]) -> _pytest.reports.TestReport:  # type: ignore
-    """Logs each function's docstring.
+    """Logs each method's docstring.
 
     Note:
-        This is done here instead of in the fixture because the function level fixtures don't run when a function is marked to be skipped.
+        This is done here instead of in the fixture because the method level fixtures don't run when a method is marked to be skipped.
         We always want to know what would be run and why it wasn't.
     """
     test_report = yield
 
-    # Print function's docstring and name.
+    # Print method's docstring and name.
     if test_report.when == "setup":
         swte.small_banner(
             f"Name: {item.function.__name__}\nDescription: {item.function.__doc__}"
@@ -151,7 +151,7 @@ def pytest_report_teststatus(report: _pytest.reports.CollectReport | _pytest.rep
     global test_execution_time
     global test_results
 
-    # This log_report can have any of the 5 outcomes in OUTCOME_MAPS. All functions only have "passed", "failed", or "skipped".
+    # This log_report can have any of the 5 outcomes in OUTCOME_MAPS. All methods only have "passed", "failed", or "skipped".
     log_report = _pytest.terminal.TestShortLogReport(*(yield))
     outcome = log_report.category.upper()
 

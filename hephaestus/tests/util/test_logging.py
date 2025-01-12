@@ -1,5 +1,5 @@
-import hephaestus.util.logging as logging
-import hephaestus.testing.swte as swte
+from hephaestus.io.logging import get_logger
+from hephaestus.testing.swte import StrConsts
 
 
 class TestLogging:
@@ -8,11 +8,11 @@ class TestLogging:
         """Verifies that base logger name functionality is unchanged"""
 
         # Loggers with the same name should be the same object.
-        assert logging.get_logger(
-            name=swte.Constants.MAGIC_STRING_ONE
-        ) is logging.get_logger(name=swte.Constants.MAGIC_STRING_ONE)
+        assert get_logger(name=StrConsts.DEADBEEF) is get_logger(
+            name=StrConsts.DEADBEEF
+        )
 
         # Loggers with different names should be different objects.
-        assert logging.get_logger(
-            name=swte.Constants.MAGIC_STRING_ONE
-        ) is not logging.get_logger(name=swte.Constants.MAGIC_STRING_TWO)
+        assert get_logger(name=StrConsts.DEADBEEF) is not get_logger(
+            name=StrConsts.BADDCAFE
+        )

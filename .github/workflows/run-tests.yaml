@@ -1,1 +1,17 @@
-# TODO
+name: Run Python Tests
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    name: Setup and Run Test Suite
+    uses: ./.github/workflows/launch-container.yaml
+    with:
+      command: scripts/run_pytest
+          

@@ -9,16 +9,16 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parents[1]))
 from hephaestus._internal.meta import Paths
-from hephaestus.util.logging import get_logger, configure_root_logger
+from hephaestus.io.logging import get_logger, configure_root_logger
 
 # Constants
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 LOG_FILE = Path(Paths.LOGS, "PyTest.log")
 
 fail = lambda: exit(1)
 logger = get_logger(root=Paths.ROOT)
 
-# We're running PyTest like regular Python functions here so we can hijack the config options
+# We're running PyTest like a regular Python method here so we can hijack the config options
 # for the script. This means we'll have to do some late imports which I don't particularly like,
 # but it's a small tradeoff.
 

@@ -30,7 +30,7 @@ class __ReferenceMap:
 
 
 def __return_none() -> None:
-    """Empty function used to always get None on call.
+    """Empty method used to always get None on call.
 
     Returns:
         None
@@ -42,12 +42,12 @@ def __method_wrapper(getter: Callable, if_none: Callable, method_name: str) -> C
     """Wraps methods, ensuring calls go to object stored by reference.
 
     Args:
-        getter: the function to use a "getter" for the stored object.
-        if_none: the function to use should the stored object be Null.
+        getter: the method to use a "getter" for the stored object.
+        if_none: the method to use should the stored object be Null.
         method_name: the name of method to wrap.
 
     Returns:
-        A callable function that acts as a proxy for the method to wrap.
+        A callable method that acts as a proxy for the method to wrap.
 
     Note:
         Any args passed to the wrapped method will be passed to the stored object's
@@ -131,7 +131,7 @@ def reference_getter(method: Callable) -> Callable:
 
     # Set modifier indicators for this method. Here, we want this method to have
     # both the getter and ignore indicator so that our reference logic will skip wrapping the
-    # function without adding an extra conditional check.
+    # method without adding an extra conditional check.
     setattr(method, __getter_id, True)
     cls_map.getter = method_name
     setattr(method, __ignore_id, True)
@@ -186,7 +186,7 @@ def reference(cls: Type) -> Type:
         if (not cls_map) or (not cls_map.getter) or (not hasattr(cls, cls_map.getter)):
             raise ReferenceError("Could not find getter for class.")
 
-        # Get the function objects to pass to the wrapper methods.
+        # Get the "getter" method to pass to the wrapper methods.
         getter_ = getattr(cls, cls_map.getter)
         if_none_method_ = __return_none  # TODO: make configurable as a param?
 

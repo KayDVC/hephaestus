@@ -3,7 +3,7 @@ from pathlib import Path
 
 from hephaestus.common.exceptions import LoggedException
 from hephaestus.common.types import PathLike
-from hephaestus.util.logging import get_logger
+from hephaestus.io.logging import get_logger
 
 _logger = get_logger(__name__)
 

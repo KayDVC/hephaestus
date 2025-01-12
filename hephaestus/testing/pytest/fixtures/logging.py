@@ -1,8 +1,13 @@
 import logging
+import os
 import pytest
 import _pytest
 
-from hephaestus.util.logging import get_logger
+from pathlib import Path
+
+import hephaestus.testing.swte as swte
+from hephaestus.common.constants import CharConsts
+from hephaestus.io.logging import get_logger
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -15,7 +20,13 @@ def module_logger(request: _pytest.fixtures.SubRequest):
     Yields:
         a logger configured with the name of the test module.
     """
-    module_logger = get_logger(file_path=request.path)
+    module_path = Path(request.path).relative_to(Path(request.session.startpath))
+    logger_name = str(module_path.with_suffix("")).replace(os.sep, ".")
+
+    module_logger = get_logger(name=logger_name)
+    swte.large_banner(
+        request.module.__name__.upper().replace(CharConsts.UNDERSCORE, CharConsts.SPACE)
+    )
     yield module_logger
 
 
