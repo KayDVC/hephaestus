@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hephaestus-lib"
-version = "0.1.1"
+version = "0.2.0"
 readme = "README.md"
 authors = [
     {name="Malakai Spann", email="MalakaiSpann@gmail.com"}
