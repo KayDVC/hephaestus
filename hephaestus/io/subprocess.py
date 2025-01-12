@@ -92,11 +92,12 @@ class SubprocessError(LoggedException):
     pass
 
 
-def command_successful(cmd: list[Any]):
+def command_successful(cmd: list[Any], cleanup: Callable = None):
     """Checks if command returned 'Success' status.
 
     Args:
         cmd: the command to run.
+        cleanup: the method to run in the event of a failure. Defaults to None.
 
     Note:
         This method doesn't capture or return any command output.
@@ -107,9 +108,19 @@ def command_successful(cmd: list[Any]):
 
     try:
         _exec(cmd, enable_output=False) is not None
-    except _SubprocessError:
-        success = False
 
+    # Execute cleanup on most exceptions, if available.
+    except Exception as e:
+        success = False
+        
+        if cleanup:
+            cleanup()
+
+        # Panic
+        if not isinstance(e, _SubprocessError):
+            raise 
+
+        
     return success
 
 

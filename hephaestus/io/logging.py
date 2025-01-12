@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from hephaestus.common.types import PathLike
-from hephaestus.common.colors import Colors
+from hephaestus.common.constants import AnsiColors
 
 """
     A wrapper for the logging interface that ensures a consistent logging experience.
@@ -65,19 +65,19 @@ class LogFormatter(logging.Formatter):
     DEFAULT_TIME_EXPR = time.gmtime
     DEFAULT_FORMAT_OPTS = {
         logging.DEBUG: FormatOptions(
-            fmt=_VERBOSE_FMT, default_color=Colors.MAGENTA, style=_FMT_STYLE
+            fmt=_VERBOSE_FMT, default_color=AnsiColors.MAGENTA, style=_FMT_STYLE
         ),
         logging.INFO: FormatOptions(
-            fmt=_SHORT_FMT, default_color=Colors.CYAN, style=_FMT_STYLE
+            fmt=_SHORT_FMT, default_color=AnsiColors.CYAN, style=_FMT_STYLE
         ),
         logging.WARNING: FormatOptions(
-            fmt=_VERBOSE_FMT, default_color=Colors.YELLOW, style=_FMT_STYLE
+            fmt=_VERBOSE_FMT, default_color=AnsiColors.YELLOW, style=_FMT_STYLE
         ),
         logging.ERROR: FormatOptions(
-            fmt=_VERBOSE_FMT, default_color=Colors.RED, style=_FMT_STYLE
+            fmt=_VERBOSE_FMT, default_color=AnsiColors.RED, style=_FMT_STYLE
         ),
         logging.CRITICAL: FormatOptions(
-            fmt=_VERBOSE_FMT, default_color=Colors.RED, style=_FMT_STYLE
+            fmt=_VERBOSE_FMT, default_color=AnsiColors.RED, style=_FMT_STYLE
         ),
     }
 
@@ -142,7 +142,7 @@ class LogFormatter(logging.Formatter):
         if not self._enable_color:
             return formatted_str
 
-        return f"{getattr(record, 'color', self.DEFAULT_FORMAT_OPTS[record.levelno].default_color)}{formatted_str}{Colors.RESET}"
+        return f"{getattr(record, 'color', self.DEFAULT_FORMAT_OPTS[record.levelno].default_color)}{formatted_str}{AnsiColors.RESET}"
 
 
 ##

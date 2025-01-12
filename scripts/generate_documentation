@@ -61,7 +61,6 @@ def generate_html():
     # Change directory to avoid OS-specific login.
     current_dir = Path.cwd()
     os.chdir(Paths.SPHINX)
-    logger.debug(f"Current dir: {Path.cwd().resolve()}")
 
     # Run commands changing back to previous directory on failure.
     for cmd_set in cmd_sets:
