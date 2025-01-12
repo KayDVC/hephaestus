@@ -112,15 +112,14 @@ def command_successful(cmd: list[Any], cleanup: Callable = None):
     # Execute cleanup on most exceptions, if available.
     except Exception as e:
         success = False
-        
+
         if cleanup:
             cleanup()
 
         # Panic
         if not isinstance(e, _SubprocessError):
-            raise 
+            raise
 
-        
     return success
 
 

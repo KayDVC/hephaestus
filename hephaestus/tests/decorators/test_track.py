@@ -1,5 +1,3 @@
-import pytest
-
 import hephaestus.testing.swte as swte
 from hephaestus.decorators.track import TraceQueue, track
 
