@@ -1,6 +1,6 @@
 import textwrap
+import logging
 
-from logging import getLogger
 from typing import Any
 
 from hephaestus._internal.meta import PROJECT_SOURCE_URL
@@ -12,31 +12,37 @@ class LoggedException(Exception):
     This class is meant to be used as the base class for any other custom
     exceptions. It logs the error message for later viewing.
     There is only one argument added to the basic Exception `__init__` method; see args below.
-    
+
     Args:
-        stack_level: the number of calls to peek back in the stack trace for
-            log info such as function name, line number, etc.
+
     """
 
-    _logger = getLogger(__name__)
+    _logger = logging.getLogger(__name__)
 
-    def __init__(self, msg: Any = None, stack_level: int = 2, *args):
-        """_summary_
-
-        Args:
-            msg: _description_. Defaults to None.
-            stack_level: _description_. Defaults to 2.
+    def __init__(
+        self,
+        msg: Any = None,
+        log_level: int = logging.ERROR,
+        stack_level: int = 2,
+        *args,
+    ):
         """
-        self._logger.error(msg, stacklevel=stack_level)
+        Args:
+            msg: the error message to log. Defaults to None.
+            log_level: the level to log the message at. Defaults to ERROR.
+            stack_level: the number of calls to peek back in the stack trace for
+                log info such as method name, line number, etc. Defaults to 2.
+        """
+        self._logger.log(level=log_level, msg=msg, stacklevel=stack_level)
         super().__init__(msg, *args)
 
+
 class _InternalError(LoggedException):
-    """Indicates a problem with the library's code was encountered.
-    """
-    
+    """Indicates a problem with the library's code was encountered."""
+
     def __init__(self, msg: Any = None, *args):
         msg = textwrap.dedent(
-        f"""\
+            f"""\
         Encountered an internal error with the Hephaestus Library:
         \t{msg}
         \tPlease report this issue here: {PROJECT_SOURCE_URL}

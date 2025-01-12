@@ -2,7 +2,7 @@ from collections import namedtuple
 from queue import Queue
 from typing import Callable
 
-from hephaestus.util.logging import get_logger
+from hephaestus.io.logging import get_logger
 from hephaestus.patterns.singleton import Singleton
 
 _logger = get_logger(__name__)
@@ -10,35 +10,33 @@ _logger = get_logger(__name__)
 ##
 # Public
 ##
-FunctionTrace = namedtuple("FunctionTrace", ["name", "args", "kwargs", "retval"])
+MethodTrace = namedtuple("MethodTrace", ["name", "args", "kwargs", "retval"])
 
 
 class Trace_Queue(Queue, metaclass=Singleton):
     """An object capable of storing"""
 
-    def get() -> FunctionTrace:
-        """_summary_
+    def get(self) -> MethodTrace:
+        """Returns the last trace.
 
         Returns:
-            _description_
+            The last method trace containing the method's name, the passed
+            positional arguments, keyword arguments, and returned value, if any.
         """
 
-        retval = None
-
-        if retval:
-            retval = super().get()
+        retval = None if self.empty() else super.get()
 
         return retval
 
 
 def track(to_track: Callable) -> Callable:
-    """Records function call for later examination.
+    """Records method call for later examination.
 
     Args:
-        to_track : the function to track.
+        to_track : the method to track.
 
     Returns:
-        The passed function with minor modification pre and post-call
+        The passed method with minor modification pre and post-call
         to support tracking capability.
 
     Note:
@@ -48,24 +46,22 @@ def track(to_track: Callable) -> Callable:
         def print_copy(*args):
             ...
 
-        Or like a regular function:
+        Or like a regular method:
 
         print_copy = track(to_track=print_copy)
 
     """
 
     def wrapper(*args, **kwargs):
-        """Forward all function parameters to wrapped function."""
+        """Forward all method parameters to wrapped method."""
         _logger.debug(
             f"Traced method: {to_track.__name__}, Args: {args}, Keyword Args: {kwargs}"
         )
 
-        # Call function and store in queue.
+        # Call method and store in queue.
         retval = to_track(*args, **kwargs)
         Trace_Queue().put(
-            FunctionTrace(
-                name=to_track.__name__, args=args, kwargs=kwargs, retval=retval
-            )
+            MethodTrace(name=to_track.__name__, args=args, kwargs=kwargs, retval=retval)
         )
 
         _logger.debug(f"Method returned. Return value: {retval}")

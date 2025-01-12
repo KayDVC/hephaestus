@@ -25,8 +25,10 @@ class ValidReferenceClass(str):
 
 class TestReference:
 
-    def test_verify_getter_defined(self):
+    def test_verify_getter_defined(self, logger):
         """Verifies reference decorator throws exception when "getter" not specified."""
+
+        logger.debug("Testing something")
         with pytest.raises(ReferenceError) as execution:
 
             @reference
@@ -43,7 +45,7 @@ class TestReference:
         with pytest.raises(ReferenceError) as execution:
 
             @reference
-            def FakeFunction():
+            def FakeMethod():
                 pass
 
         assert "object is not a class" in str(execution.value)

@@ -12,7 +12,7 @@ from hephaestus.common.colors import Colors
 """
     A wrapper for the logging interface that ensures a consistent logging experience.
     
-    Many classes utility functions in this file are defined elsewhere for public use, however,
+    Many classes utility method in this file are defined elsewhere for public use, however,
     their use would cause a circular dependency.
 """
 
@@ -58,7 +58,7 @@ class LogFormatter(logging.Formatter):
     """
 
     _SHORT_FMT = "[{asctime}] {levelname:7}: {message}"
-    _VERBOSE_FMT = f"{_SHORT_FMT} ({{module}}:{{funcName}}:{{lineno}})"
+    _VERBOSE_FMT = f"{_SHORT_FMT} ({{name}}:{{funcName}}:{{lineno}})"
     _FMT_STYLE = "{"
 
     DEFAULT_ENABLE_COLOR = True
@@ -142,7 +142,7 @@ class LogFormatter(logging.Formatter):
         if not self._enable_color:
             return formatted_str
 
-        return f"{getattr(record, "color", self.DEFAULT_FORMAT_OPTS[record.levelno].default_color)}{formatted_str}{Colors.RESET}"
+        return f"{getattr(record, 'color', self.DEFAULT_FORMAT_OPTS[record.levelno].default_color)}{formatted_str}{Colors.RESET}"
 
 
 ##
@@ -246,16 +246,12 @@ def configure_root_logger(
         logger.addHandler(handler)
 
 
-def get_logger(
-    name: str = None, root: PathLike = None, file_path: PathLike = None
-) -> logging.Logger:
+def get_logger(name: str = None, root: PathLike = None) -> logging.Logger:
     """Creates a log of application activity.
 
     Args:
         name: the name of the calling module. Defaults to None.
         root: the path to the root of the project. Defaults to none.
-        file_path: the path to the file where this logger will be used. Only use this
-        parameter when fine control over logger naming is necessary.
 
     Returns:
         A bare logger object that accepts all default levels of log messages.
@@ -264,8 +260,6 @@ def get_logger(
         If the calling file is not in the project and the `name` arg is provided,
         this acts just like logging.getLogger(name). If the file is in the project AND
         the `root` arg is provided, the name will be relative to the root of the project.
-        If `file_path` is specified, it will be used to name the logger instead of the calling
-        file.
     """
     # Convert supplied path to absolute path.
     if root:
@@ -274,11 +268,7 @@ def get_logger(
     # Get logger
     if root and root.exists():
         try:
-            file_path = (
-                Path(file_path).resolve()
-                if file_path
-                else Path(inspect.stack()[1].filename).resolve()
-            )
+            file_path = Path(inspect.stack()[1].filename).resolve()
             name = ".".join(file_path.relative_to(root).with_suffix("").parts)
         except ValueError:
             pass

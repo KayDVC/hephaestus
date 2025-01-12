@@ -1,4 +1,4 @@
-from hephaestus.util.logging import get_logger
+from hephaestus.io.logging import get_logger
 
 _logger = get_logger(__name__)
 MAX_PRINT_WIDTH = 80
@@ -6,13 +6,13 @@ LARGE_DIVIDER = "=" * int(MAX_PRINT_WIDTH / 2)
 SMALL_DIVIDER = "-" * MAX_PRINT_WIDTH
 
 
-class Constants:
+class StrConsts:
     MAGIC_STRING_ONE = "DEADBEEF"
     MAGIC_STRING_TWO = "BADDCAFE"
 
 
 ##
-# Logging Functions
+# Logging Methods
 ##
 def large_banner(msg: str, **kwargs):
     """Logs message between dividers.

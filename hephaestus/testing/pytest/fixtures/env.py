@@ -1,6 +1,6 @@
 import pytest
 
-from hephaestus.patterns.singleton import Singleton
+import hephaestus.patterns.singleton as singleton
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -9,4 +9,4 @@ def reset_env():
     yield
 
     # Reset any shared memory
-    Singleton._Singleton__shared_instances.clear()
+    singleton.clear_all()

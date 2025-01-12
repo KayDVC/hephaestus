@@ -10,8 +10,8 @@ authors = [
     {name="Malakai Spann", email="MalakaiSpann@gmail.com"}
 ]
 
-description = "A collection of useful Python Classes, Functions, and Constants"
-requires-python = ">=3.6"
+description = "A collection of useful Python Classes, Methods, and Constants"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 classifiers = [
     'Intended Audience :: Developers',
@@ -35,3 +35,7 @@ where = ["."]
 include = ["hephaestus.*"]
 exclude = ["hephaestus.tests*", "hephaestus*.__pycache__*"]
 namespaces = true 
+
+[tool.black]
+extend-exclude = '^.*\.(md|txt)'
+include = '\.pyi?$|scripts/.*'

@@ -11,8 +11,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1]))
 from hephaestus._internal.meta import Paths
 from hephaestus.io.file import create_directory
+from hephaestus.io.logging import get_logger, configure_root_logger
 from hephaestus.io.subprocess import run_command, command_successful
-from hephaestus.util.logging import get_logger, configure_root_logger
 
 # Constants
 VERSION = "1.0.0"
@@ -32,9 +32,9 @@ def generate_rst_files():
         str(Path(Paths.SPHINX, "source")),
         "--module-first",  # Generate module documentation before generating submodule docs.
         "--force",  # Overwrite existing rst files.
-        "--separate",           # Generate a file for each module
+        "--separate",  # Generate a file for each module
         "--implicit-namespaces",  # Who wants to stick __init__.py everywhere.,
-        "--private",                # I have the memory of a goldfish. Include private docs too.
+        "--private",  # I have the memory of a goldfish. Include private docs too.
     ]
 
     run_command(cmd, err="Failed to create ReStructured Text files.")

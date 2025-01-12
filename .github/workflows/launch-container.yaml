@@ -1,0 +1,30 @@
+name: Container Launcher
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        description: The command to run
+        type: string
+      args:
+        required: false
+        description: Arguments to pass to the command
+        type: string
+
+jobs:
+  execute:
+    name: Execute Command in Container
+    runs-on: ubuntu-latest
+    env:
+      image_tag: hephaestus-dev:latest
+      app_dir: /dev/hephaestus
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Build Container
+        run: docker build --file docker/Dockerfile --tag $image_tag .
+
+      - name: Run Command Using Container
+        run: docker run --rm --volume .:$app_dir --workdir $app_dir $image_tag ${{ inputs.command }} ${{ inputs.args }}
