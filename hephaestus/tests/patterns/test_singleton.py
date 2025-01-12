@@ -121,7 +121,7 @@ class TestSingleton:
         logger.info("Creating objects")
         obj1 = FakeClassWithData()
 
-        obj1.data.append(StrConsts.MAGIC_STRING_ONE)
+        obj1.data.append(StrConsts.DEADBEEF)
 
         obj2 = FakeClassWithData()
 

@@ -148,6 +148,7 @@ def set_lock_type(lock_type: Type) -> bool:
 
 def clear_all():
     """Destroys all known Singleton instances."""
+    _logger.debug("Clearing all known Singleton instances.")
     with Singleton._Singleton__singleton_lock:
 
         shared_instances = Singleton._Singleton__shared_instances

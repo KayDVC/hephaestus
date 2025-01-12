@@ -13,7 +13,7 @@ _logger = get_logger(__name__)
 MethodTrace = namedtuple("MethodTrace", ["name", "args", "kwargs", "retval"])
 
 
-class Trace_Queue(Queue, metaclass=Singleton):
+class TraceQueue(Queue, metaclass=Singleton):
     """An object capable of storing"""
 
     def get(self) -> MethodTrace:
@@ -23,10 +23,15 @@ class Trace_Queue(Queue, metaclass=Singleton):
             The last method trace containing the method's name, the passed
             positional arguments, keyword arguments, and returned value, if any.
         """
-
-        retval = None if self.empty() else super.get()
+        retval = None if self.empty() else super().get()
 
         return retval
+
+    def clear(self):
+        """Removes all MethodTraces from memory."""
+        _logger.debug("Clearing trace queue.")
+        while not self.empty():
+            _ = self.get()
 
 
 def track(to_track: Callable) -> Callable:
@@ -60,7 +65,7 @@ def track(to_track: Callable) -> Callable:
 
         # Call method and store in queue.
         retval = to_track(*args, **kwargs)
-        Trace_Queue().put(
+        TraceQueue().put(
             MethodTrace(name=to_track.__name__, args=args, kwargs=kwargs, retval=retval)
         )
 

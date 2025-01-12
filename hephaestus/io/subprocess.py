@@ -9,7 +9,6 @@ from hephaestus.io.logging import get_logger
 _logger = get_logger(__name__)
 
 
-# TODO: option to pass the information of the actual caller
 class _SubprocessError(Exception):
     pass
 
